@@ -48,6 +48,9 @@ function watching() {
 	watch(['app/scss/style.scss'], styles)
 	watch(['app/js/main.js'], scripts)
 	watch(['app/*.html']).on('change', browserSync.reload)
+	watch(['app/img/*.jpg'], imgToDist)
+	watch(['app/img/*.png'], imgToDist)
+	watch(['app/img/*.jpeg'], imgToDist)
 }
 
 // Ф-ия для перезагрузки страницы при изменении в дирректории
@@ -71,6 +74,12 @@ function building() {
 	.pipe(dest('dist'))
 }
 
+// Перенос всех img
+function imgToDist() {
+	return src(['app/img/*.jpg','app/img/*.png', 'app/img/*.jpeg'])
+		.pipe(dest('dist/img'))
+}
+
 // Ф-ия удаления папки build
 function cleanDist() {
 
@@ -82,8 +91,9 @@ exports.styles = styles;
 exports.scripts = scripts;
 exports.watching = watching;
 exports.browsersync = browsersync;
+exports.imgToDist = imgToDist;
 
 // Запуск данных действий по умолчанию при вызове gulp
 exports.default = parallel(styles, scripts, browsersync, watching)
 // Удаление папки dist и создание новой 
-exports.build = series(cleanDist, building)
+exports.build = series(cleanDist, imgToDist, building)
