@@ -12,6 +12,8 @@ const browserSync = require('browser-sync').create();
 const autoprefixer = require('gulp-autoprefixer');
 // Для удаления файлов и папок
 const clean = require('gulp-clean');
+// Создание SVG-sprite
+const svgSprite = require('gulp-svg-sprite');
 
 // Ф-ия для перевода scss в css 
 function styles() {
@@ -51,6 +53,7 @@ function watching() {
 	watch(['app/img/*.jpg'], imgToDist)
 	watch(['app/img/*.png'], imgToDist)
 	watch(['app/img/*.jpeg'], imgToDist)
+	watch(['app/img/*.svg'], svgSprites)
 }
 
 // Ф-ия для перезагрузки страницы при изменении в дирректории
@@ -80,6 +83,19 @@ function imgToDist() {
 		.pipe(dest('dist/img'))
 }
 
+// Создание svg-sprite
+function svgSprites() {
+	return src('app/img/*.svg')
+		.pipe(svgSprite({
+			mode: {
+				stack: {
+					sprite: '../sprite.svg'
+				}
+			}
+		}))
+		.pipe(dest('dist/img'))
+}
+
 // Ф-ия удаления папки build
 function cleanDist() {
 
@@ -94,6 +110,6 @@ exports.browsersync = browsersync;
 exports.imgToDist = imgToDist;
 
 // Запуск данных действий по умолчанию при вызове gulp
-exports.default = parallel(styles, scripts, browsersync, watching)
+exports.default = parallel(styles, scripts, imgToDist, svgSprites, browsersync, watching)
 // Удаление папки dist и создание новой 
-exports.build = series(cleanDist, imgToDist, building)
+exports.build = series(cleanDist,  building)
